@@ -118,10 +118,12 @@ namespace TLevelingSystem
             if (player == null || !player.Active) return;
             if (!await TDatabase.UserExistsAsync(player.Name))
             {
-                Console.WriteLine("Player " + player.Name + " does not exist in database. Attempting to insert.");
+                Console.WriteLine("[LevelingSystem] Player " + player.Name + " does not exist in database. Attempting to insert.");
                 TDatabase.InsertUser(player);
             }
+
         }
+
     }
 }
 

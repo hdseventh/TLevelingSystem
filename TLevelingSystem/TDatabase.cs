@@ -1,5 +1,8 @@
 ﻿using MySql.Data.MySqlClient;
 using TShockAPI;
+using Microsoft.Xna.Framework;
+using Terraria;
+using Terraria.Localization;
 
 namespace TLevelingSystem
 {
@@ -32,6 +35,10 @@ namespace TLevelingSystem
                 cmd.ExecuteNonQuery();
             }
         }
+        private static void SendFloatingText(TSPlayer player, string text, Vector2 position)
+        {
+            player.SendData(PacketTypes.CreateCombatTextExtended, text, 255, position.X, position.Y);
+        }
 
         public static async Task AddExpToPlayer(TSPlayer player, int exp)
         {
@@ -56,7 +63,7 @@ namespace TLevelingSystem
                     {
                         int totalExp = reader.GetInt32(0);
                         int level = reader.GetInt32(1);
-                        player.SendSuccessMessage($"You have gained {exp} exp! Total exp: {totalExp}");
+                        SendFloatingText(player, $"+{exp} exp", player.TPlayer.position);
 
                         // Check for level up
                         int expForNextLevel = GetExpForNextLevel(level);
@@ -192,7 +199,7 @@ namespace TLevelingSystem
                     cmd.Parameters.AddWithValue("@Name", player.Name);
 
                     await cmd.ExecuteNonQueryAsync();
-                    TShock.Log.ConsoleInfo($"User {player.Name} inserted into database.");
+                    TShock.Log.ConsoleInfo($"[LevelingSystem] User {player.Name} inserted into database.");
                 }
             }
             catch (Exception ex)
@@ -212,6 +219,7 @@ namespace TLevelingSystem
 
                     var cmd = connection.CreateCommand();
                     cmd.CommandText = "SELECT EXISTS(SELECT 1 FROM Players WHERE Name = @username LIMIT 1)";
+                    cmd.Parameters.AddWithValue("@username", username);
 
                     var reader = await cmd.ExecuteReaderAsync();
                     while (reader.Read())
