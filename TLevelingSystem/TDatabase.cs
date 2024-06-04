@@ -1,8 +1,6 @@
-﻿using MySql.Data.MySqlClient;
+﻿using Microsoft.Xna.Framework;
+using MySql.Data.MySqlClient;
 using TShockAPI;
-using Microsoft.Xna.Framework;
-using Terraria;
-using Terraria.Localization;
 
 namespace TLevelingSystem
 {
@@ -234,6 +232,42 @@ namespace TLevelingSystem
             {
                 TShock.Log.Error($"Error viewing leaderboard: {ex.Message}");
                 return false;
+            }
+        }
+
+        public static async Task<(int Exp, int Level)> GetPlayerData(string playerName)
+        {
+            try
+            {
+                using (var connection = new MySqlConnection(connectionString))
+                {
+                    await connection.OpenAsync();
+
+                    var cmd = connection.CreateCommand();
+                    cmd.CommandText = @"
+                SELECT Exp, Level
+                FROM Players
+                WHERE Name = @Name;
+            ";
+                    cmd.Parameters.AddWithValue("@Name", playerName);
+
+                    var reader = await cmd.ExecuteReaderAsync();
+                    if (reader.Read())
+                    {
+                        int exp = reader.GetInt32(0);
+                        int level = reader.GetInt32(1);
+                        return (exp, level);
+                    }
+                    else
+                    {
+                        return (0, 0); // Player not found, returning default values
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                TShock.Log.Error($"Error fetching data for player {playerName}: {ex.Message}");
+                return (0, 0); // In case of an error, returning default values
             }
         }
     }
