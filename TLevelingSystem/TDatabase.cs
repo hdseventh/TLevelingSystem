@@ -244,11 +244,11 @@ namespace TLevelingSystem
                     await connection.OpenAsync();
 
                     var cmd = connection.CreateCommand();
-                    cmd.CommandText = @"
-                SELECT Exp, Level
-                FROM Players
-                WHERE Name = @Name;
-            ";
+                            cmd.CommandText = @"
+                        SELECT Exp, Level
+                        FROM Players
+                        WHERE Name = @Name;
+                    ";
                     cmd.Parameters.AddWithValue("@Name", playerName);
 
                     var reader = await cmd.ExecuteReaderAsync();
