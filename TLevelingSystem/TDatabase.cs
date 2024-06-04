@@ -244,7 +244,7 @@ namespace TLevelingSystem
                     await connection.OpenAsync();
 
                     var cmd = connection.CreateCommand();
-                            cmd.CommandText = @"
+                    cmd.CommandText = @"
                         SELECT Exp, Level
                         FROM Players
                         WHERE Name = @Name;
